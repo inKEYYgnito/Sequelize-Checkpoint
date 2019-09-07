@@ -22,16 +22,16 @@ const Task = db.define('Task', {
   due: Sequelize.DATE
 });
 
-Task.clearCompleted = async () => {
-  await Task.destroy({
+Task.clearCompleted = () => {
+  return Task.destroy({
     where: {
       complete: true
     }
   })
 }
 
-Task.completeAll = async () => {
-  await Task.update({
+Task.completeAll = () => {
+  return Task.update({
     complete: true
   }, {
     where: {
@@ -40,28 +40,28 @@ Task.completeAll = async () => {
   })
 }
 
-Task.belongsTo(Task, {as: 'parent'});
+Task.belongsTo(Task, { as: 'parent' });
 
-Task.prototype.getTimeRemaining = function() {
+Task.prototype.getTimeRemaining = function () {
   if (!this.due) return Infinity
   else return this.due - (new Date())
 }
 
-Task.prototype.isOverdue = function() {
+Task.prototype.isOverdue = function () {
   if (this.complete) return false
   return !(this.getTimeRemaining() > 0)
 }
 
-Task.prototype.addChild = async function({ name }) {
-  return await Task.create({name, parentId: this.id})
+Task.prototype.addChild = function ({ name }) {
+  return Task.create({ name, parentId: this.id })
 }
 
-Task.prototype.getChildren = async function() {
-  return await Task.findAll({ where: { parentId: this.id}})
+Task.prototype.getChildren = function () {
+  return Task.findAll({ where: { parentId: this.id } })
 }
 
-Task.prototype.getSiblings = async function() {
-  return await Task.findAll({ where: { parentId: this.parentId, id: { $ne: this.id }}})
+Task.prototype.getSiblings = function () {
+  return Task.findAll({ where: { parentId: this.parentId, id: { $ne: this.id } } })
 }
 
 //---------^^^---------  your code above  ---------^^^----------
